@@ -31,14 +31,19 @@ int main()
     }
 
     /* Read data and write to file output.txt */
-	int readIndex = 0;
+	int readResult = 1;
+	item elem;
     while(1){
-		int readResult = fputs((*ptr).data[readIndex]), pFile);
-		if(readResult == EOF){
-			printf("Failure to Write index No.%d ",readIndex);
+		/* Check whether the buffer is empty and update elem */
+		while(ptr->in  == ptr ->out);
+		elem = (*ptr).buffer[(*ptr).out];
+		(*ptr).out = ((*ptr).out + 1)  % BUFFER_SIZE;
+
+		readResult = fprintf(pFile, "%s", elem.data);
+		if(readResult < 0){
+			printf("Failure to Write index ");
 			break;
 		}
-		readIndex++;
 	}
 	fclose(pFile);
 	shm_unlink(name);

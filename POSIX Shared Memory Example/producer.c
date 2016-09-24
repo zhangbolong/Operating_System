@@ -8,18 +8,19 @@ int main()
 	shared_struct *ptr;
 	pid_t  pid;
 
-	/* $ fork another process */
+	/* fork another process */
 	pid = fork();
 	
 	if (pid < 0) { /* error occurred */
 		printf("Fork Failed\n");
 		exit(-1);
 	}
+
 	else if (pid == 0) {/* child process if pid == 0 */
         
 		sleep(1);
         /* execute consumer */
-		
+		execlp("./consumer", "consumer", NULL);
 	}
 	else { /* parent process */
 		int size;
@@ -64,12 +65,12 @@ int main()
 				end = 1;
 			}
             /* Write elem to the bounded buffer */
-			if(fgets(elem.data, 100, pFile) != NULL){
-				elem.id++;
-				elem.data[end] = fgets(elem.data, 100, pFile);
-				end++;
-			}
-			/* if there is no more data to be read from the file */
+			while((((*ptr).in + 1) % BUFFER_SIZE) == (*ptr).out);
+			ptr->buffer[ptr->in] = elem;
+			(*ptr).in = ((*ptr).in + 1) % BUFFER_SIZE;
+			
+
+ 			/* if there is no more data to be read from the file */
 			if (end) break;
         }
         fclose(pFile);
